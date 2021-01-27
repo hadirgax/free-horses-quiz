@@ -1,3 +1,4 @@
+import React from 'react';
 import { createGlobalStyle, ThemeProvider } from 'styled-components';
 import Meta from '../src/components/Meta/Meta';
 import db from '../db.json';
@@ -27,16 +28,17 @@ const GlobalStyle = createGlobalStyle`
   }
 `;
 
-const theme = db.theme;
+const { theme } = db;
 
 export default function App({ Component, pageProps }) {
   return (
     <>
       <ThemeProvider theme={theme}>
-        <Meta title={db.title + " | hadirga"} bg={db.bg} />
+        <Meta title={`${db.title} | hadirga`} bg={db.bg} />
         <GlobalStyle />
+        {/* eslint-disable-next-line react/jsx-props-no-spreading */}
         <Component {...pageProps} />
       </ThemeProvider>
     </>
-  )
+  );
 }

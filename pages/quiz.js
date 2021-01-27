@@ -1,27 +1,21 @@
 import React from 'react';
-import styled from 'styled-components';
+import { useRouter } from 'next/router';
 
-import db from '../db.json';
-import Widget from '../src/components/Widget/Widget';
+import styled from 'styled-components';
 import QuizBackground from '../src/components/QuizBackground/QuizBackground';
-import Footer from '../src/components/Footer/Footer';
-import GitHubCorner from '../src/components/GitHubCorner/GitHubCorner';
 import QuizLogo from '../src/components/QuizLogo/QuizLogo';
-import QuizForm from '../src/components/QuizForm/QuizForm';
+import GitHubCorner from '../src/components/GitHubCorner/GitHubCorner';
+import Widget from '../src/components/Widget/Widget';
+import Footer from '../src/components/Footer/Footer';
 import QuizGalera from '../src/components/QuizGalera/QuizGalera';
 
-export const QuizContainer = styled.div`
-  width: 100%;
-  max-width: 350px;
-  padding-top: 45px;
-  margin: auto 10%;
-  @media screen and (max-width: 500px) {
-    margin: auto;
-    padding: 15px;
-  }
-`;
+import db from '../db.json';
+import { QuizContainer } from './index';
 
-export default function Home() {
+export default function QuizPage() {
+  const router = useRouter();
+  const nomeJogador = router.query.name;
+
   return (
     <QuizBackground backgroundImage={db.bg}>
       <QuizContainer>
@@ -31,9 +25,17 @@ export default function Home() {
             <h1>{db.title}</h1>
           </Widget.Header>
           <Widget.Content>
-            <p>Teste seus conhecimentos sobre Cavalos e divirta-se criando o seu AluraQuiz!</p>
+            <p>
+              Seja bem-vindo 👉🏾
+              <span style={{color: 'yellow', fontSize: '20px'}}>{nomeJogador}</span>
+              !
+            </p>
+            <p>Aqui vai a pergunta!</p>
+            <p>a) Aqui vai a opção!</p>
+            <p>b) Aqui vai a opção!</p>
+            <p>c) Aqui vai a opção!</p>
+            <p>d) Aqui vai a opção!</p>
           </Widget.Content>
-          <QuizForm />
         </Widget>
 
         <Widget>

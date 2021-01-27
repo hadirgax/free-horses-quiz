@@ -1,3 +1,6 @@
+import React from 'react';
+import { useRouter } from "next/router";
+
 import styled from 'styled-components';
 
 const StyledQuizForm = styled.form`
@@ -30,20 +33,43 @@ const Button = styled.input`
     border-radius: 4px;
     margin-top: 25px;
     margin-bottom: 32px;
-    background: ${({ theme }) => theme.colors.secondary};
+    background: ${({ theme }) => theme.colors.primary};
     border: 1px solid ${({ theme }) => theme.colors.secondary};
-    padding-left: 15px;
     font: inherit;
     color: ${({ theme }) => theme.colors.contrastText};
+
+    &:hover {
+      background: ${({ theme }) => theme.colors.secondary};
+    }
+
+    &:disabled {
+      background-color: gray;
+      border: none;
+    }
 `;
 
 const QuizForm = () => {
-    return (
-        <StyledQuizForm>
-            <Input type="text" placeholder="Diz ai seu nome para jogar :)" />
-            <Button type="button" value="Jogar" />
-        </StyledQuizForm>
-    );
+  const router = useRouter();
+  const [name, setName] = React.useState('');
+
+  return (
+    <StyledQuizForm onSubmit={(infosDoEvento) => {
+      infosDoEvento.preventDefault();
+      router.push(`/quiz?name=${name}`)
+    }}>
+      <Input
+        type="text"
+        onChange={(infosDoEvento) => {
+          // name = infosDoEvento.target.value;
+          setName(infosDoEvento.target.value);
+        }}
+        placeholder="Diz ai seu nome para jogar :)" />
+      <Button 
+        type="submit"
+        value={`Jogar ${name}`} 
+        disabled={name.length === 0} />
+    </StyledQuizForm>
+  );
 }
 
 export default QuizForm;

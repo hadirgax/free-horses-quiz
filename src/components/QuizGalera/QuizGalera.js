@@ -17,19 +17,20 @@ const QuizLink = styled.a`
 `;
 
 const QuizGalera = (props) => {
+  let nomeQuiz = props.linkQuiz;
+  nomeQuiz = nomeQuiz.replace('https://', '');
+  nomeQuiz = nomeQuiz.replace('.vercel.app/', '');
 
-    let nomeQuiz = props.linkQuiz;
-    nomeQuiz = nomeQuiz.replace("https://", "")
-    nomeQuiz = nomeQuiz.replace(".vercel.app/", "")
-
-    return (
-        <QuizDiv>
-            <QuizLink 
-               href={props.linkQuiz}
-               target="_blank"
-               >{nomeQuiz}</QuizLink>
-        </QuizDiv>
-    );
-}
+  return (
+    <QuizDiv>
+      <QuizLink
+        href={props.linkQuiz}
+        target="_blank"
+      >
+        {nomeQuiz}
+      </QuizLink>
+    </QuizDiv>
+  );
+};
 
 export default QuizGalera;
