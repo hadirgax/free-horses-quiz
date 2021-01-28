@@ -1,27 +1,21 @@
 import React from 'react';
-import styled from 'styled-components';
+import { useRouter } from 'next/router';
 
 import db from '../db.json';
 import Widget from '../src/components/Widget/Widget';
 import QuizBackground from '../src/components/QuizBackground/QuizBackground';
+import QuizContainer from '../src/components/QuizContainer/QuizContainer';
 import Footer from '../src/components/Footer/Footer';
 import GitHubCorner from '../src/components/GitHubCorner/GitHubCorner';
 import QuizLogo from '../src/components/QuizLogo/QuizLogo';
-import QuizForm from '../src/components/QuizForm/QuizForm';
+import Input from '../src/components/Input/Input';
+import Button from '../src/components/Button/Button';
 import QuizGalera from '../src/components/QuizGalera/QuizGalera';
 
-export const QuizContainer = styled.div`
-  width: 100%;
-  max-width: 350px;
-  padding-top: 45px;
-  margin: auto 10%;
-  @media screen and (max-width: 500px) {
-    margin: auto;
-    padding: 15px;
-  }
-`;
-
 export default function Home() {
+  const router = useRouter();
+  const [name, setName] = React.useState('');
+
   return (
     <QuizBackground backgroundImage={db.bg}>
       <QuizContainer>
@@ -32,8 +26,25 @@ export default function Home() {
           </Widget.Header>
           <Widget.Content>
             <p>Teste seus conhecimentos sobre Cavalos e divirta-se criando o seu AluraQuiz!</p>
+            <form onSubmit={(infosDoEvento) => {
+            infosDoEvento.preventDefault();
+            router.push(`/quiz?name=${name}`);
+          }}>
+            <Input
+              type="text"
+              name="nomeDoUsuario"
+              value={name}
+              onChange={(infosDoEvento) => setName(infosDoEvento.target.value)}
+              placeholder="Diz ai seu nome para jogar :)"
+            />
+            <Button
+              type="submit"
+              // value={`Jogar ${name}`}
+              disabled={name.length === 0}>
+              {`Jogar ${name}`}
+            </Button>
+          </form>
           </Widget.Content>
-          <QuizForm />
         </Widget>
 
         <Widget>

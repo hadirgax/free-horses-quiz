@@ -3,50 +3,210 @@ import { useRouter } from 'next/router';
 
 import styled from 'styled-components';
 import QuizBackground from '../src/components/QuizBackground/QuizBackground';
+import QuizContainer from '../src/components/QuizContainer/QuizContainer';
 import QuizLogo from '../src/components/QuizLogo/QuizLogo';
 import GitHubCorner from '../src/components/GitHubCorner/GitHubCorner';
 import Widget from '../src/components/Widget/Widget';
 import Footer from '../src/components/Footer/Footer';
-import QuizGalera from '../src/components/QuizGalera/QuizGalera';
+import AlternativesForm from '../src/components/AlternativesForm/AlternativesForm';
 
 import db from '../db.json';
-import { QuizContainer } from './index';
+import Button from '../src/components/Button/Button';
+
+function ResultWidget({ results }) {
+  return (
+    <Widget>
+      <Widget.Header>
+        Resultados do quiz
+      </Widget.Header>
+      <Widget.Content>
+        <p>
+          Você acertou
+          {' '}
+          {/* {results.reduce((sumAtual, resultAtual) => {
+            const isAcerto = resultAtual === true;
+            if (isAcerto) {
+              return sumAtual + 1;
+            }
+            return sumAtual;
+          }, 0)} */}
+          {results.filter((x) => x).length}
+          {' '}
+          questões, parabéns!</p>
+        <ul>
+          {results.map((result, resultIndex) => (
+            <li key={`result__${resultIndex}`}>
+              #{resultIndex + 1}
+              {' '}    
+              Resultado:
+              {result === true ? "Acertou!" : "Errou!"}
+            </li>
+          ))}
+        </ul>
+      </Widget.Content>
+    </Widget>
+  );
+}
+
+function LoadingWidget() {
+  return (
+    <Widget>
+      <Widget.Header>
+        Carregando...
+      </Widget.Header>
+      <Widget.Content>
+        [Desafio do Loading]
+      </Widget.Content>
+    </Widget>
+  );
+}
+
+function QuestionWidget({
+  question,
+  questionIndex,
+  totalQuestions,
+  onSubmit,
+  addResult,
+}) {
+  const [selectedAlternative, setSelectedAlternative] = React.useState(undefined);
+  const [isQuestionSubmited, setIsQuestionSubmited] = React.useState(false);
+  const questionId = `question__${questionIndex}`;
+  const isCorrect = selectedAlternative === question.answer;
+  const hasAlternativeSelected = selectedAlternative !== undefined;
+
+  return (
+    <Widget>
+      <Widget.Header>
+        {/* arrow */}
+        <h3>{'<'}</h3>
+        <h3>
+          {`Pergunta ${questionIndex + 1} de ${totalQuestions}`}
+        </h3>
+      </Widget.Header>
+
+      <img
+        alt="Descrução"
+        style={{
+          width: '100%',
+          height: '150px',
+          objectFit: 'cover',
+        }}
+        src={question.image}
+      />
+
+      <Widget.Content>
+        <h2>{question.title}</h2>
+        <p>{question.description}</p>
+
+        <AlternativesForm
+          onSubmit={(infosDoEvento) => {
+            infosDoEvento.preventDefault();
+            setIsQuestionSubmited(true);
+            setTimeout(() => {
+              addResult(isCorrect);
+              onSubmit();
+              setIsQuestionSubmited(false);
+              setSelectedAlternative(undefined);
+            }, 3 * 1000);
+            onSubmit();
+          }}
+        >
+          {question.alternatives.map((alternative, alternativeIndex) => {
+            const alternativeId = `alternative__${alternativeIndex}`;
+            const alternativeStatus  = isCorrect ? "SUCCESS" : "ERROR";
+            const isSelected = selectedAlternative === alternativeIndex;
+            return (
+              <Widget.Topic
+                as="label"
+                htmlFor={alternativeId}
+                key={alternativeId}
+                data-selected={isSelected}
+                data-status={isQuestionSubmited && alternativeStatus}
+              >
+                <input
+                  style={{display: 'none'}}
+                  id={alternativeId}
+                  name={questionId}
+                  onChange={() => setSelectedAlternative(alternativeIndex)}
+                  type="radio"
+                />
+                {alternative}
+              </Widget.Topic>
+            );
+          })}
+
+          {/* <pre>
+            {JSON.stringify(question, null, 4)}
+          </pre> */}
+
+          <Button type="submit" disabled={!hasAlternativeSelected}>
+            Confirmar
+          </Button>
+          {isQuestionSubmited && isCorrect && <p>Você acertou!</p>}
+          {isQuestionSubmited && !isCorrect && <p>Você errou!</p>}
+        </AlternativesForm>
+      </Widget.Content>
+    </Widget>
+  );
+}
+
+const screenStates = {
+  QUIZ: 'QUIZ',
+  LOADING: 'LOADING',
+  RESULT: 'RESULT',
+};
 
 export default function QuizPage() {
-  const router = useRouter();
-  const nomeJogador = router.query.name;
+  // const router = useRouter();
+  // const nomeJogador = router.query.name;
+  const [screenState, setScreenState] = React.useState(screenStates.LOADING);
+  const [results, setResults] = React.useState([]);
+  const totalQuestions = db.questions.length;
+  const [currentQuestion, setCurrentQuestion] = React.useState(0);
+  const questionIndex = currentQuestion;
+  const question = db.questions[questionIndex];
+
+  function addResult(result) {
+    setResults([
+      ...results,
+      result
+    ]);
+  }
+
+  React.useEffect(() => {
+    // fetch()...
+    setTimeout(() => {
+      setScreenState(screenStates.QUIZ);
+    }, 1 * 1000);
+  }, []);
+
+  function handleSubmitQuiz() {
+    const nextQuestion = questionIndex + 1;
+    if (nextQuestion < totalQuestions) {
+      setCurrentQuestion(nextQuestion);
+    } else {
+      setScreenState(screenStates.RESULT);
+    }
+  }
 
   return (
     <QuizBackground backgroundImage={db.bg}>
       <QuizContainer>
         <QuizLogo />
-        <Widget>
-          <Widget.Header>
-            <h1>{db.title}</h1>
-          </Widget.Header>
-          <Widget.Content>
-            <p>
-              Seja bem-vindo 👉🏾
-              <span style={{color: 'yellow', fontSize: '20px'}}>{nomeJogador}</span>
-              !
-            </p>
-            <p>Aqui vai a pergunta!</p>
-            <p>a) Aqui vai a opção!</p>
-            <p>b) Aqui vai a opção!</p>
-            <p>c) Aqui vai a opção!</p>
-            <p>d) Aqui vai a opção!</p>
-          </Widget.Content>
-        </Widget>
 
-        <Widget>
-          <Widget.Content>
-            <h1>Quizes da galera</h1>
-            <p>Dá uma olhada nesses quizes incriveis que o pessoal da Imersão React fez:</p>
-            <QuizGalera linkQuiz="https://imersao-alura-peach.vercel.app/" />
-            <QuizGalera linkQuiz="https://quiz-beatles.victorcorrea1.vercel.app/" />
-            <QuizGalera linkQuiz="https://aluraquiz-show.noebezerra.vercel.app/" />
-          </Widget.Content>
-        </Widget>
+        {screenState === screenStates.QUIZ && (
+          <QuestionWidget
+            question={question}
+            totalQuestions={totalQuestions}
+            questionIndex={questionIndex}
+            onSubmit={handleSubmitQuiz}
+            addResult={addResult}
+          />
+        )}
+
+        {screenState === screenStates.LOADING && <LoadingWidget />}
+
+        {screenState === screenStates.RESULT && <ResultWidget results={results} />}
         <Footer />
       </QuizContainer>
       <GitHubCorner projectUrl="https://github.com/hadirga/free-horses-quiz" />
