@@ -2,16 +2,17 @@ import React from 'react';
 import { useRouter } from 'next/router';
 
 import styled from 'styled-components';
-import QuizBackground from '../src/components/QuizBackground/QuizBackground';
-import QuizContainer from '../src/components/QuizContainer/QuizContainer';
-import QuizLogo from '../src/components/QuizLogo/QuizLogo';
-import GitHubCorner from '../src/components/GitHubCorner/GitHubCorner';
-import Widget from '../src/components/Widget/Widget';
-import Footer from '../src/components/Footer/Footer';
-import AlternativesForm from '../src/components/AlternativesForm/AlternativesForm';
+import QuizBackground from '../../components/QuizBackground/QuizBackground';
+import QuizContainer from '../../components/QuizContainer/QuizContainer';
+import QuizLogo from '../../components/QuizLogo/QuizLogo';
+import GitHubCorner from '../../components/GitHubCorner/GitHubCorner';
+import Widget from '../../components/Widget/Widget';
+import Footer from '../../components/Footer/Footer';
+import AlternativesForm from '../../components/AlternativesForm';
 
-import db from '../db.json';
-import Button from '../src/components/Button/Button';
+// import db from '../../../db.json';
+import Button from '../../components/Button/Button';
+import BackLinkArrow from '../../components/BackLinkArrow';
 
 function ResultWidget({ results }) {
   return (
@@ -32,14 +33,16 @@ function ResultWidget({ results }) {
           }, 0)} */}
           {results.filter((x) => x).length}
           {' '}
-          questões, parabéns!</p>
+          questões, parabéns!
+        </p>
         <ul>
           {results.map((result, resultIndex) => (
             <li key={`result__${resultIndex}`}>
-              #{resultIndex + 1}
-              {' '}    
+              #
+              {resultIndex + 1}
+              {' '}
               Resultado:
-              {result === true ? "Acertou!" : "Errou!"}
+              {result === true ? 'Acertou!' : 'Errou!'}
             </li>
           ))}
         </ul>
@@ -77,8 +80,7 @@ function QuestionWidget({
   return (
     <Widget>
       <Widget.Header>
-        {/* arrow */}
-        <h3>{'<'}</h3>
+        <BackLinkArrow href="/" />
         <h3>
           {`Pergunta ${questionIndex + 1} de ${totalQuestions}`}
         </h3>
@@ -113,7 +115,7 @@ function QuestionWidget({
         >
           {question.alternatives.map((alternative, alternativeIndex) => {
             const alternativeId = `alternative__${alternativeIndex}`;
-            const alternativeStatus  = isCorrect ? "SUCCESS" : "ERROR";
+            const alternativeStatus = isCorrect ? 'SUCCESS' : 'ERROR';
             const isSelected = selectedAlternative === alternativeIndex;
             return (
               <Widget.Topic
@@ -124,7 +126,7 @@ function QuestionWidget({
                 data-status={isQuestionSubmited && alternativeStatus}
               >
                 <input
-                  style={{display: 'none'}}
+                  style={{ display: 'none' }}
                   id={alternativeId}
                   name={questionId}
                   onChange={() => setSelectedAlternative(alternativeIndex)}
@@ -156,20 +158,21 @@ const screenStates = {
   RESULT: 'RESULT',
 };
 
-export default function QuizPage() {
+export default function QuizPage({ externalQuestions, externalBg }) {
   // const router = useRouter();
   // const nomeJogador = router.query.name;
   const [screenState, setScreenState] = React.useState(screenStates.LOADING);
   const [results, setResults] = React.useState([]);
-  const totalQuestions = db.questions.length;
   const [currentQuestion, setCurrentQuestion] = React.useState(0);
   const questionIndex = currentQuestion;
-  const question = db.questions[questionIndex];
+  const question = externalQuestions[questionIndex];
+  const totalQuestions = externalQuestions.length;
+  const bg = externalBg;
 
   function addResult(result) {
     setResults([
       ...results,
-      result
+      result,
     ]);
   }
 
@@ -190,7 +193,7 @@ export default function QuizPage() {
   }
 
   return (
-    <QuizBackground backgroundImage={db.bg}>
+    <QuizBackground backgroundImage={bg}>
       <QuizContainer>
         <QuizLogo />
 

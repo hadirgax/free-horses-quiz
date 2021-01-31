@@ -65,7 +65,13 @@
       }
     ],
     "external": [
-      ""
+      "https://aluraquiz-coffee.leonardot07.vercel.app/",
+      "https://cakuiz.pmdpaula.vercel.app/",
+      "https://imersao-react-alura.tamirfaria.vercel.app/",
+      "https://quiz-project.jundrigues.vercel.app/",
+      "https://meta-quiz-imersao-react.markkop.vercel.app/",
+      "https://alura-quiz-seasons.rodlemos.vercel.app/"
+
     ],
     "theme": {
       "colors": {

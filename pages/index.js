@@ -1,5 +1,6 @@
 import React from 'react';
 import { useRouter } from 'next/router';
+import { motion } from 'framer-motion';
 
 import db from '../db.json';
 import Widget from '../src/components/Widget/Widget';
@@ -10,7 +11,7 @@ import GitHubCorner from '../src/components/GitHubCorner/GitHubCorner';
 import QuizLogo from '../src/components/QuizLogo/QuizLogo';
 import Input from '../src/components/Input/Input';
 import Button from '../src/components/Button/Button';
-import QuizGalera from '../src/components/QuizGalera/QuizGalera';
+import Link from '../src/components/Link';
 
 export default function Home() {
   const router = useRouter();
@@ -20,43 +21,86 @@ export default function Home() {
     <QuizBackground backgroundImage={db.bg}>
       <QuizContainer>
         <QuizLogo />
-        <Widget>
+        <Widget
+          as={motion.section}
+          transition={{ delay: 0, duration: 0.5 }}
+          variants={{
+            show: { opacity: 1, y: 0 },
+            hidden: { opacity: 0, y: '100%' },
+          }}
+          initial="hidden"
+          animate="show"
+        >
           <Widget.Header>
             <h1>{db.title}</h1>
           </Widget.Header>
           <Widget.Content>
             <p>Teste seus conhecimentos sobre Cavalos e divirta-se criando o seu AluraQuiz!</p>
             <form onSubmit={(infosDoEvento) => {
-            infosDoEvento.preventDefault();
-            router.push(`/quiz?name=${name}`);
-          }}>
-            <Input
-              type="text"
-              name="nomeDoUsuario"
-              value={name}
-              onChange={(infosDoEvento) => setName(infosDoEvento.target.value)}
-              placeholder="Diz ai seu nome para jogar :)"
-            />
-            <Button
-              type="submit"
+              infosDoEvento.preventDefault();
+              router.push(`/quiz?name=${name}`);
+            }}
+            >
+              <Input
+                type="text"
+                name="nomeDoUsuario"
+                value={name}
+                onChange={(infosDoEvento) => setName(infosDoEvento.target.value)}
+                placeholder="Diz ai seu nome para jogar :)"
+              />
+              <Button
+                type="submit"
               // value={`Jogar ${name}`}
-              disabled={name.length === 0}>
-              {`Jogar ${name}`}
-            </Button>
-          </form>
+                disabled={name.length === 0}
+              >
+                {`Jogar ${name}`}
+              </Button>
+            </form>
           </Widget.Content>
         </Widget>
 
-        <Widget>
+        <Widget
+          as={motion.section}
+          transition={{ delay: 0.5, duration: 0.5 }}
+          variants={{
+            show: { opacity: 1, y: 0 },
+            hidden: { opacity: 0, y: '100%' },
+          }}
+          initial="hidden"
+          animate="show"
+        >
           <Widget.Content>
             <h1>Quizes da galera</h1>
             <p>Dá uma olhada nesses quizes incriveis que o pessoal da Imersão React fez:</p>
-            <QuizGalera linkQuiz="https://imersao-alura-peach.vercel.app/" />
-            <QuizGalera linkQuiz="https://quiz-beatles.victorcorrea1.vercel.app/" />
-            <QuizGalera linkQuiz="https://aluraquiz-show.noebezerra.vercel.app/" />
+            <ul>
+              {db.external.map((linkExterno) => {
+                const [projectNAme, githubUser] = linkExterno
+                  .replace(/\//g, '')
+                  .replace('https:', '')
+                  .replace('.vercel.app', '')
+                  .split('.');
+                return (
+                  <Widget.Topic
+                    as={Link}
+                    href={`/quiz/${projectNAme}___${githubUser}`}
+                  >
+                    {`${githubUser}/${projectNAme}`}
+                  </Widget.Topic>
+                );
+              })}
+            </ul>
           </Widget.Content>
         </Widget>
-        <Footer />
+        <Footer
+          as={motion.footer}
+          transition={{ delay: 1, duration: 0.5 }}
+          variants={{
+            show: { opacity: 1, y: 0 },
+            hidden: { opacity: 0, y: '100%' },
+          }}
+          initial="hidden"
+          animate="show"
+        />
       </QuizContainer>
       <GitHubCorner projectUrl="https://github.com/hadirga/free-horses-quiz" />
     </QuizBackground>
