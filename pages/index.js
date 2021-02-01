@@ -17,6 +17,12 @@ export default function Home() {
   const router = useRouter();
   const [name, setName] = React.useState('');
 
+  function handleOnClickLink(e) {
+    if (name.length === 0) {
+      return e.preventDefault();
+    }
+  }
+
   return (
     <QuizBackground backgroundImage={db.bg}>
       <QuizContainer>
@@ -73,26 +79,26 @@ export default function Home() {
             <h1>Quizes da galera</h1>
             <p>Dá uma olhada nesses quizes incriveis que o pessoal da Imersão React fez:</p>
             <ul>
-                {db.external.map((linkExterno) => {
-                  const [projectNAme, githubUser] = linkExterno
-                    .replace(/\//g, '')
-                    .replace('https:', '')
-                    .replace('.vercel.app', '')
-                    .split('.');
+              {db.external.map((linkExterno) => {
+                const [projectNAme, githubUser] = linkExterno
+                  .replace(/\//g, '')
+                  .replace('https:', '')
+                  .replace('.vercel.app', '')
+                  .split('.');
                   // const hrefLink = !name.length === 0
                   //   ? `/quiz/${projectNAme}___${githubUser}`
                   //   : '';
-                  return (
-                    <Widget.Topic
-                      as={Link}
-                      href={`/quiz/${projectNAme}___${githubUser}`}
-                      // data-link={`${!name.length === 0}`}
-                    >
-                      {`${githubUser}/${projectNAme}`}
-                    </Widget.Topic>
-                  );
-                })}
-              </ul>
+                return (
+                  <Widget.Topic
+                    as={Link}
+                    href={`/quiz/${projectNAme}___${githubUser}`}
+                    onClick={e => handleOnClickLink(e)}
+                  >
+                    {`${githubUser}/${projectNAme}`}
+                  </Widget.Topic>
+                );
+              })}
+            </ul>
           </Widget.Content>
         </Widget>
         <Footer

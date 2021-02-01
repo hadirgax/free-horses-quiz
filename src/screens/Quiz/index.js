@@ -13,6 +13,7 @@ import AlternativesForm from '../../components/AlternativesForm';
 // import db from '../../../db.json';
 import Button from '../../components/Button/Button';
 import BackLinkArrow from '../../components/BackLinkArrow';
+import Toast from '../../components/Toast';
 
 function ResultWidget({ results }) {
   return (
@@ -69,6 +70,7 @@ function QuestionWidget({
   questionIndex,
   totalQuestions,
   onSubmit,
+  showToast,
   addResult,
 }) {
   const [selectedAlternative, setSelectedAlternative] = React.useState(undefined);
@@ -110,7 +112,12 @@ function QuestionWidget({
               setIsQuestionSubmited(false);
               setSelectedAlternative(undefined);
             }, 3 * 1000);
-            onSubmit();
+            //isQuestionSubmited && isCorrect && showToast('success', 'Você acertou!');
+            //isQuestionSubmited && !isCorrect && showToast('danger', 'Você errou, a próxima será melhor!');
+
+            isCorrect
+              ? showToast('success', 'Você acertou!')
+              : showToast('danger', 'Você errou, a próxima será melhor!');
           }}
         >
           {question.alternatives.map((alternative, alternativeIndex) => {
@@ -144,8 +151,8 @@ function QuestionWidget({
           <Button type="submit" disabled={!hasAlternativeSelected}>
             Confirmar
           </Button>
-          {isQuestionSubmited && isCorrect && <p>Você acertou!</p>}
-          {isQuestionSubmited && !isCorrect && <p>Você errou!</p>}
+          {/* {isQuestionSubmited && isCorrect && <p>Você acertou!</p>}
+          {isQuestionSubmited && !isCorrect && <p>Você errou!</p>} */}
         </AlternativesForm>
       </Widget.Content>
     </Widget>
@@ -158,16 +165,21 @@ const screenStates = {
   RESULT: 'RESULT',
 };
 
-export default function QuizPage({ externalQuestions, externalBg }) {
+function QuizPage({ questions, theBg }) {
   // const router = useRouter();
   // const nomeJogador = router.query.name;
   const [screenState, setScreenState] = React.useState(screenStates.LOADING);
   const [results, setResults] = React.useState([]);
   const [currentQuestion, setCurrentQuestion] = React.useState(0);
   const questionIndex = currentQuestion;
-  const question = externalQuestions[questionIndex];
-  const totalQuestions = externalQuestions.length;
-  const bg = externalBg;
+  const question = questions[questionIndex];
+  const totalQuestions = questions.length;
+  const bg = theBg;
+
+  // toast values
+  const [list, setList] = React.useState([]);
+  const timeoutValue = 2500;
+  let toastProperties = null;
 
   function addResult(result) {
     setResults([
@@ -192,27 +204,60 @@ export default function QuizPage({ externalQuestions, externalBg }) {
     }
   }
 
+  function showToast(type, descriptionReceived) {
+    const id = Math.floor((Math.random() * 101) + 1);
+
+    switch (type) {
+      case 'success':
+        toastProperties = {
+          id,
+          title: 'Parabéns!',
+          description: descriptionReceived,
+          backgroundColor: '#5cb85c',
+          // icon: checkIcon,
+        };
+        break;
+      case 'danger':
+        toastProperties = {
+          id,
+          title: 'Errado!',
+          description: descriptionReceived,
+          backgroundColor: '#d9534f',
+          // icon: errorIcon,
+        };
+        break;
+      default:
+        setList([]);
+    }
+    setList([...list, toastProperties]);
+  }
+
   return (
     <QuizBackground backgroundImage={bg}>
       <QuizContainer>
         <QuizLogo />
-
         {screenState === screenStates.QUIZ && (
           <QuestionWidget
             question={question}
             totalQuestions={totalQuestions}
             questionIndex={questionIndex}
             onSubmit={handleSubmitQuiz}
+            showToast={showToast}
             addResult={addResult}
           />
         )}
-
         {screenState === screenStates.LOADING && <LoadingWidget />}
-
         {screenState === screenStates.RESULT && <ResultWidget results={results} />}
+        <Toast
+          toastList={list}
+          timeoutValue={timeoutValue}
+        />
+
         <Footer />
       </QuizContainer>
       <GitHubCorner projectUrl="https://github.com/hadirga/free-horses-quiz" />
     </QuizBackground>
   );
 }
+
+export default QuizPage;

@@ -63,6 +63,10 @@ Widget.Topic = styled.a`
   &:focus {
     opacity: .5;
   }
+
+  &[data-link="false"] {
+    opacity: .5;
+  }
 `;
 
 export default Widget;
